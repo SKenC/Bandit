@@ -1,4 +1,3 @@
-
 struct Environment
     arm_pros::Vector{Float64}
     arm_num::Int64

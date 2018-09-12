@@ -1,10 +1,9 @@
-include("eps_greedy.jl")
-include("rs.jl")
+include("MAB_module.jl")
 
-#using PyPlot
+using .MAB_MODULE
 using Plots
 using Statistics
-using Random
+
 
 function simulation(sim_num, steps)
     ϵ_start = 1.
@@ -18,10 +17,10 @@ function simulation(sim_num, steps)
 
     reward_means = Vector{}()
     win_means = Vector{}()
-    for algorithm in [rs]
+    for algorithm in [rs, eps_greedy]
         regrets = zeros(sim_num, steps)
         wins = zeros(sim_num, steps)
-        for sim in 1:sim_num
+        @progress for sim in 1:sim_num
             regret = 0.
             init!(algorithm)
             for step in 1:steps
@@ -50,16 +49,13 @@ function simulation(sim_num, steps)
         #@show wins
     end
 
+
     println("DONE.")
 
-    #w_means = [mean(wins[:, i]) for i=1:steps]
-    #r_means = mean!(zeros(1, steps), regrets)
-    #println(typeof(r_means))
-    #this Three dots means to give an each element as argument.
-    #graph_data = hcat(reward_means...)
     graph_data = hcat(win_means...)
     time = Vector{Int}(1:steps)
-    plot(time, graph_data)
+    plot(time, graph_data, xscale=:log)
+
     # for i=1:sim_num
     #     plot(time, regrets[i, :])
     # end
@@ -68,4 +64,5 @@ function simulation(sim_num, steps)
 
 end
 
-simulation(10, 1001)
+
+simulation(1000, 1000000)

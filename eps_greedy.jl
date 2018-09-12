@@ -1,5 +1,5 @@
-include("algorithm_base.jl")
-include("environment.jl")
+# include("algorithm_base.jl")
+# include("environment.jl")
 
 mutable struct Egreedy <: Algorithm
     ϵ::Float64

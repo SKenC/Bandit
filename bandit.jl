@@ -68,4 +68,4 @@ function simulation(sim_num, steps)
 
 end
 
-simulation(10, 10000)
+simulation(10, 1001)

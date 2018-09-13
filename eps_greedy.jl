@@ -2,7 +2,7 @@
 # include("environment.jl")
 
 mutable struct Egreedy <: Algorithm
-    ϵ::Float64
+    e::Float64
     env::Environment
     actionValues::Vector{Float64}
     counts::Vector{Int}             #numbers of selection of each arm.
@@ -10,7 +10,7 @@ mutable struct Egreedy <: Algorithm
 
     #constructor
     function Egreedy(ϵ::Float64, env::Environment)
-        return new( ϵ,
+        return new( e,
                     env,
                     zeros(env.arm_num),
                     zeros(env.arm_num),
@@ -21,7 +21,7 @@ end
 #epsilon greedy
 function select_arm(algo::Egreedy)
     #@show algo.actionValues
-    if rand() < algo.ϵ
+    if rand() < algo.e
         #@show "random"
         #return a random number from 1 to number of arms
         return rand(1:length(algo.actionValues))

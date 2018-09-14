@@ -9,6 +9,7 @@ module MAB_MODULE
         Egreedy,
         RS,
         update!,
-        init!
+        init!,
+        update_env
 
 end

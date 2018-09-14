@@ -9,7 +9,7 @@ mutable struct Egreedy <: Algorithm
     sum_rewards::Vector             #sum of an earned reward of each arm
 
     #constructor
-    function Egreedy(ϵ::Float64, env::Environment)
+    function Egreedy(e::Float64, env::Environment)
         return new( e,
                     env,
                     zeros(env.arm_num),

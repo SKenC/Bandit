@@ -6,19 +6,20 @@ using Plots
 using Statistics
 
 
-function simulation(sim_num, steps)
+function simulation(sim_num, steps, arm_num=2)
     e_start = 1.
     #A Probability of each arm
     #distribution = [0.3, 0.8]
-    distribution = [0.49, 0.51]
+    #distribution = [0.49, 0.51]
     #distribution = [0.2, 0.4, 0.8, 0.9]
-    env = Environment(distribution)
+
+    env = Environment(rand(arm_num))
     eps_greedy = Egreedy(e_start, env)
     rs = RS(env)
 
     reward_means = Vector{}()
     win_means = Vector{}()
-    for algorithm in [rs, eps_greedy]
+    for algorithm in [rs]
         regrets = zeros(sim_num, steps)
         wins = zeros(sim_num, steps)
         for sim in 1:sim_num
@@ -40,6 +41,10 @@ function simulation(sim_num, steps)
                     algorithm.e -= 1/200.
                 end
 
+                if step % 10000 == 0
+                    update_env!(env)
+                end
+
             end
 
             percent = sim/sim_num * 100
@@ -55,7 +60,8 @@ function simulation(sim_num, steps)
 
     graph_data = hcat(win_means...)
     time = Vector{Int}(1:steps)
-    plot(time, graph_data, xscale=:log)
+    #xscale=:log
+    plot(time, graph_data)
 
     # for i=1:sim_num
     #     plot(time, regrets[i, :])
@@ -66,4 +72,4 @@ function simulation(sim_num, steps)
 end
 
 
-@time simulation(100, 1000)
+@time simulation(10, 100000)

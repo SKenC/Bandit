@@ -1,7 +1,9 @@
 abstract type Algorithm end
 
-function init!(algo::Algorithm)
-    algo.actionValues = zeros(algo.env.arm_num)
+function init!(algo::Algorithm, reset_actval::Bool)
+    if reset_actval
+        algo.actionValues = zeros(algo.env.arm_num)
+    end
     algo.counts = zeros(algo.env.arm_num)
     algo.sum_rewards = zeros(algo.env.arm_num)
 end

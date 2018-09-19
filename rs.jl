@@ -9,7 +9,7 @@ mutable struct RS <: Algorithm
     r::Float64
     #constructor
     function RS(env::Environment)
-        sorted_pro = sort(env.arm_pros)
+        sorted_pro = sort(env.arm_pros, rev=true)
         r = (sorted_pro[1] + sorted_pro[2]) / 2
         @show r
         return new( env,
@@ -18,6 +18,11 @@ mutable struct RS <: Algorithm
                     zeros(env.arm_num),
                     r)
     end
+end
+
+function update_r!(algo::RS)
+    sorted_pro = sort(algo.env.arm_pros, rev=true)
+    algo.r = (sorted_pro[1] + sorted_pro[2]) / 2
 end
 
 #epsilon greedy

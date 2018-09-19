@@ -10,6 +10,7 @@ module MAB_MODULE
         RS,
         update!,
         init!,
-        update_env
+        update_env!,
+        update_r!
 
 end

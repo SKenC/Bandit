@@ -1,49 +1,51 @@
 include("algorithm_base.jl")
 include("environment.jl")
 
-mutable struct RS <: Algorithm
+mutable struct UCB1 <: Algorithm
     env::Environment
     actionValues::Vector{Float64}
     counts::Vector{Int}             #numbers of selection of each arm.
+    total_count::Int
+    rewards::Matrix
     sum_rewards::Vector             #sum of an earned reward of each arm
-    r::Float64
     #constructor
-    function RS(env::Environment)
-        sorted_pro = sort(env.arm_pros, rev=true)
-        r = (sorted_pro[1] + sorted_pro[2]) / 2
-        #@show r
+    function UCB1(env::Environment)
         return new( env,
                     zeros(env.arm_num),
                     zeros(env.arm_num),
-                    zeros(env.arm_num),
-                    r)
+                    0,
+                    zeros(env.arm_num))
     end
 end
 
-#update reference r by best value.
-function update_r!(algo::RS)
-    sorted_pro = sort(algo.env.arm_pros, rev=true)
-    algo.r = (sorted_pro[1] + sorted_pro[2]) / 2
-end
-
 #epsilon greedy
-function select_arm(algo::RS)
+function select_arm(algo::UCB1)
+    min, minidx = findmin(algo.actionValues)
+    if min == 0
+        return minidx
+    end
     #return index of maximum value in the action values.
     return greedy(algo)
 end
 
-function calc_value(algo::RS, selected)
+function calc_value(algo::UCB1, selected)
     average = algo.sum_rewards[selected] / algo.counts[selected]
-    algo.actionValues[selected] = algo.counts[selected] * (average - algo.r)
+    varience =
+    algo.actionValues[selected] =
+        average + sqrt((2*log(algo.total_count))/algo.counts[selected])
+    # algo.actionValues[selected] =
+    #     average + sqrt((2*log(algo.total_count))/algo.counts[selected])
+    #@show algo.actionValues
 end
 
 #chose arm and update each parameter.
-function update!(algo::RS)
+function update!(algo::UCB1)
     selected = select_arm(algo)
     reward = get_reward(algo.env.arm_pros, selected)
 
     #update this experiment's current state.
     algo.counts[selected] += 1
+    algo.total_count += 1
     algo.sum_rewards[selected] += reward
 
     #calculation of action value and save.
@@ -54,17 +56,4 @@ function update!(algo::RS)
 
     return selected, regret, reward
 
-end
-
-#simple version of the RS Algorithm.
-function simple_update!(algo::RS)
-    selected = select_arm(algo)
-    reward = get_reward(algo.env.arm_pros, selected)
-
-    #RS = n(E-R) <==> delta RS is only (r-R).
-    algo.actionValues[selected] += reward - algo.r
-
-    regret = algo.env.max_pro - algo.env.arm_pros[selected]
-
-    return selected, regret
 end

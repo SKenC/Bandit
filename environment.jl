@@ -21,5 +21,4 @@ end
 function update_env!(env::Environment, arm_pros::Vector)
     env.arm_pros = arm_pros
     env.max_pro, env.correct_arm = findmax(env.arm_pros)
-    @show env.max_pro
 end

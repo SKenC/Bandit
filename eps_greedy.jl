@@ -54,6 +54,6 @@ function update!(algo::Egreedy)
 
     #@show algo.sum_rewards
 
-    return selected, regret
+    return selected, regret, reward
 
 end

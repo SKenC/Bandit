@@ -4,7 +4,7 @@ module MAB_MODULE
     include("eps_greedy.jl")
     include("rs.jl")
     include("my_rs.jl")
-    include("meta-bandit.jl")
+    #include("meta-bandit.jl")
     include("ucb1tuned.jl")
     export
         Algorithm,
@@ -12,7 +12,7 @@ module MAB_MODULE
         Egreedy,
         RS,
         MYRS,
-        MetaBandit,
+        #MetaBandit,
         UCB1,
         update!,
         init!,

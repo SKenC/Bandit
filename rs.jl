@@ -26,7 +26,7 @@ function update_r!(algo::RS)
     algo.r = (sorted_pro[1] + sorted_pro[2]) / 2
 end
 
-#epsilon greedy
+
 function select_arm(algo::RS)
     #return index of maximum value in the action values.
     return greedy(algo)
@@ -58,13 +58,13 @@ end
 
 #simple version of the RS Algorithm.
 function simple_update!(algo::RS)
+
     selected = select_arm(algo)
     reward = get_reward(algo.env.arm_pros, selected)
 
     #RS = n(E-R) <==> delta RS is only (r-R).
     algo.actionValues[selected] += reward - algo.r
-
     regret = algo.env.max_pro - algo.env.arm_pros[selected]
 
-    return selected, regret
+    return selected, regret, reward
 end

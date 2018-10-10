@@ -6,15 +6,18 @@ mutable struct UCB1 <: Algorithm
     actionValues::Vector{Float64}
     counts::Vector{Int}             #numbers of selection of each arm.
     total_count::Int
-    rewards::Matrix
     sum_rewards::Vector             #sum of an earned reward of each arm
+    sq_sum_rewards::Vector
+    tuned::Bool
     #constructor
-    function UCB1(env::Environment)
+    function UCB1(env::Environment, tuned::Bool)
         return new( env,
                     zeros(env.arm_num),
                     zeros(env.arm_num),
                     0,
-                    zeros(env.arm_num))
+                    zeros(env.arm_num),
+                    zeros(env.arm_num),
+                    tuned)
     end
 end
 
@@ -30,11 +33,17 @@ end
 
 function calc_value(algo::UCB1, selected)
     average = algo.sum_rewards[selected] / algo.counts[selected]
-    varience =
-    algo.actionValues[selected] =
-        average + sqrt((2*log(algo.total_count))/algo.counts[selected])
-    # algo.actionValues[selected] =
-    #     average + sqrt((2*log(algo.total_count))/algo.counts[selected])
+    if algo.tuned
+        varience =
+            (algo.sq_sum_rewards[selected] / algo.counts[selected]) - average^2
+                +  sqrt((2*log(algo.total_count))/algo.counts[selected])
+        v = (varience > 0.25) ? varience : 0.25
+        algo.actionValues[selected] =
+            average + sqrt((log(algo.total_count)/algo.counts[selected]) * v)
+    else
+        algo.actionValues[selected] =
+            average + sqrt((2*log(algo.total_count))/algo.counts[selected])
+    end
     #@show algo.actionValues
 end
 
@@ -47,6 +56,7 @@ function update!(algo::UCB1)
     algo.counts[selected] += 1
     algo.total_count += 1
     algo.sum_rewards[selected] += reward
+    algo.sq_sum_rewards[selected] += reward^2
 
     #calculation of action value and save.
     calc_value(algo, selected)

@@ -3,9 +3,8 @@ mutable struct Environment
     arm_num::Int64
     max_pro
     correct_arm::Int64
-    function Environment(arm_pros::Vector{Float64})
-            max, max_idx = findmax(arm_pros)
-            new(arm_pros, length(arm_pros), max, max_idx)
+    function Environment(arm_num::Int)
+            new(zeros(arm_num), arm_num, 0., 0)
     end
 end
 

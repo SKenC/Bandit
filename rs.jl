@@ -9,15 +9,20 @@ mutable struct RS <: Algorithm
     r::Float64
     #constructor
     function RS(env::Environment)
-        sorted_pro = sort(env.arm_pros, rev=true)
-        r = (sorted_pro[1] + sorted_pro[2]) / 2
+        # sorted_pro = sort(env.arm_pros, rev=true)
+        # r = (sorted_pro[1] + sorted_pro[2]) / 2
         #@show r
         return new( env,
                     zeros(env.arm_num),
                     zeros(env.arm_num),
                     zeros(env.arm_num),
-                    r)
+                    0.)
     end
+end
+
+function init!(algo::RS)
+    init_algo!(algo)
+    update_r!(algo)
 end
 
 #update reference r by best value.
@@ -26,7 +31,7 @@ function update_r!(algo::RS)
     algo.r = (sorted_pro[1] + sorted_pro[2]) / 2
 end
 
-
+#epsilon greedy
 function select_arm(algo::RS)
     #return index of maximum value in the action values.
     return greedy(algo)

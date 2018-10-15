@@ -21,6 +21,9 @@ mutable struct UCB1 <: Algorithm
     end
 end
 
+function init!(algo::UCB1)
+    init_algo!(algo)
+end
 #epsilon greedy
 function select_arm(algo::UCB1)
     min, minidx = findmin(algo.actionValues)

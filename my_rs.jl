@@ -6,36 +6,59 @@ mutable struct MYRS <: Algorithm
     actionValues::Vector{Float64}
     counts::Vector{Int}             #numbers of selection of each arm.
     sum_rewards::Vector             #sum of an earned reward of each arm
+    average::Vector
     r::Float64
-    alpha::Float64
+    gamma::Float64
+    alpha_r::Float64
+    n::Vector
     test_name::String
     #constructor
-    function MYRS(env::Environment, r::Float64, alpha::Float64, test_name="")
+    function MYRS(env::Environment, r::Float64, gamma::Float64, alpha_r::Float64, test_name="")
         return new( env,
                     zeros(env.arm_num),
                     zeros(env.arm_num),
                     zeros(env.arm_num),
+                    zeros(env.arm_num),
                     r,
-                    alpha,
+                    gamma,
+                    alpha_r,
+                    zeros(env.arm_num),
                     test_name)
     end
 end
 
+function init!(algo::MYRS)
+    init_algo!(algo)
+    algo.r = 1.
+end
 
 function select_arm(algo::MYRS)
     #return index of maximum value in the action values.
     return greedy(algo)
 end
 
-function calc_value(algo::MYRS, selected)
-    average = algo.sum_rewards[selected] / algo.counts[selected]
-    algo.actionValues[selected] = algo.counts[selected] * (average - algo.r)
+function calc_value(algo::MYRS, selected, reward)
 
     if algo.test_name == "merge"
-        algo.r = (1. - algo.alpha) * algo.r + algo.alpha * (average - algo.r)
+        #algo.n = 1 + algo.gamma * algo.n
+        mean = algo.sum_rewards[selected] / algo.counts[selected]
+        # algo.average[selected] =
+        #     (mean + algo.gamma * algo.n * algo.average[selected]) / (1. + algo.gamma * algo.n)
+        algo.average[selected] =
+            (mean + algo.gamma * algo.average[selected]) / (1. + algo.gamma)
+        algo.r += algo.alpha_r * (algo.average[selected] - algo.r)
     else
-        algo.r += algo.alpha * (average - algo.r)
+        algo.average[selected] = algo.sum_rewards[selected] / algo.counts[selected]
+        algo.r += algo.alpha_r * (algo.average[selected] - algo.r)
     end
+
+    algo.n[selected] = algo.gamma * algo.n + 1
+    algo.actionValues[selected] = algo.n[selected] * (algo.average[selected] - algo.r)
+
+
+    #algo.actionValues[selected] = algo.gamma * algo.actionValues[selected]
+
+
     #@show algo.r selected
 end
 
@@ -49,7 +72,7 @@ function update!(algo::MYRS)
     algo.sum_rewards[selected] += reward
 
     #calculation of action value and save.
-    calc_value(algo, selected)
+    calc_value(algo, selected, reward)
 
     #calc regret.
     regret = algo.env.max_pro - algo.env.arm_pros[selected]

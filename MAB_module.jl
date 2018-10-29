@@ -6,12 +6,14 @@ module MAB_MODULE
     include("my_rs.jl")
     #include("meta-bandit.jl")
     include("ucb1tuned.jl")
+    include("lsx.jl")
     export
         Algorithm,
         Environment,
         Egreedy,
         RS,
         MYRS,
+        LSX,
         #MetaBandit,
         UCB1,
         update!,

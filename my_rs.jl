@@ -39,27 +39,13 @@ end
 
 function calc_value(algo::MYRS, selected, reward)
 
-    if algo.test_name == "merge"
-        #algo.n = 1 + algo.gamma * algo.n
-        mean = algo.sum_rewards[selected] / algo.counts[selected]
-        # algo.average[selected] =
-        #     (mean + algo.gamma * algo.n * algo.average[selected]) / (1. + algo.gamma * algo.n)
-        algo.average[selected] =
-            (mean + algo.gamma * algo.average[selected]) / (1. + algo.gamma)
-        algo.r += algo.alpha_r * (algo.average[selected] - algo.r)
-    else
-        algo.average[selected] = algo.sum_rewards[selected] / algo.counts[selected]
-        algo.r += algo.alpha_r * (algo.average[selected] - algo.r)
-    end
+    algo.average[selected] = algo.sum_rewards[selected] / algo.counts[selected]
+    algo.r += algo.alpha_r * (algo.average[selected] - algo.r)
 
-    algo.n[selected] = algo.gamma * algo.n + 1
-    algo.actionValues[selected] = algo.n[selected] * (algo.average[selected] - algo.r)
-
-
+    #algo.n[selected] = algo.gamma * algo.n + 1
+    algo.actionValues[selected] += (reward - algo.r)#algo.counts[selected] * (algo.average[selected] - algo.r)
     #algo.actionValues[selected] = algo.gamma * algo.actionValues[selected]
 
-
-    #@show algo.r selected
 end
 
 #update each variables and calc parameters for epsilon greedy algorithm

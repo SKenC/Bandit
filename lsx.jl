@@ -11,9 +11,10 @@ mutable struct LSX <: Algorithm
     gamma::Float64
     alpha::Float64
     model::String
+    opt::Bool
     #constructor
-    function LSX(;env::Environment, alpha::Float64, model="")
-        if model == "opt"
+    function LSX(;env::Environment, alpha::Float64, model="", gamma=1.0, opt=false)
+        if opt
             r = opt_r(env.arm_pros)
         else
             r = 0.5
@@ -25,16 +26,17 @@ mutable struct LSX <: Algorithm
                     zeros(env.arm_num),
                     zeros(env.arm_num),
                     r,
-                    1.0,
+                    gamma,
                     alpha,
-                    model)
+                    model,
+                    opt)
     end
 end
 
 function init!(algo::LSX)
     algo.actionValues = zeros(algo.env.arm_num)
     algo.counts = zeros(algo.env.arm_num)
-    if algo.model == "opt"
+    if algo.opt
         algo.r = opt_r(algo.env.arm_pros)
     else
         algo.r = 0.5
@@ -82,7 +84,7 @@ function update!(algo::LSX)
     #update this experiment's current state.
     algo.counts[selected] += 1
 
-    if algo.model != "opt"
+    if !algo.opt
         algo.r = algo.r + algo.alpha * (algo.w[selected]/algo.counts[selected] - algo.r)
     end
     #calc regret.

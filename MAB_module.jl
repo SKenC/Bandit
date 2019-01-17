@@ -7,6 +7,7 @@ module MAB_MODULE
     #include("meta-bandit.jl")
     include("ucb1tuned.jl")
     include("lsx.jl")
+    include("tompson_sampling.jl")
     export
         Algorithm,
         Environment,
@@ -16,6 +17,7 @@ module MAB_MODULE
         LSX,
         #MetaBandit,
         UCB1,
+        Tompson,
         update!,
         init!,
         update_env!,
